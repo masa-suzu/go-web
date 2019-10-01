@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"html/template"
 	"log"
 	"net/http"
@@ -22,12 +23,16 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	addr := flag.String("addr", ":8080", "app address")
+	flag.Parse()
+
 	r := newRoom()
 	http.Handle("/", &templateHandler{fileName: "chat.html"})
 	http.Handle("/room", r)
 	go r.run()
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Println("Started with Port", *addr)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe", err)
 	}
 }
